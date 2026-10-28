@@ -34,7 +34,7 @@ setsid "$SERVE_BIN" "$BASE_MODEL" \
   --connect-timeout 120 \
   --peer-timeout 120 \
   --layers 40 --tp-attention --engram-direct \
-  --prefill-path device --prefill-rows 2048 --slots 8 --context 8192 \
+  --prefill-path device --prefill-rows 2048 --slots 8 --context 12288 \
   $([ -f "$DSPARK_MODEL" ] && echo "--dspark $DSPARK_MODEL --dspark-vocab auto:$VOCAB_DIR" || true) \
   > "$WORKER_LOG" 2>&1 < /dev/null &
 

@@ -29,6 +29,9 @@ for i in $(seq 1 60); do
         echo "=== [READY] Kirei HIP Dual Engine is live on port $API_PORT ==="
         cat /tmp/kirei-api-models.json
         echo ""
+        pkill -f 'web-dashboard.py' || true
+        setsid python3 "$ROOT_DIR/scripts/web-dashboard.py" > /tmp/strix-kirei-dashboard.log 2>&1 < /dev/null &
+        echo "Web Dashboard live on http://127.0.0.1:18232"
         exit 0
     fi
     sleep 2
