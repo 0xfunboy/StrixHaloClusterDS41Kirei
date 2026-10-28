@@ -75,6 +75,8 @@ class BackendSpec:
     short_label: str
 
     def public(self) -> dict:
+        default_output = 4096 if self.capacity <= 16384 else (8192 if self.capacity <= 32768 else 32768)
+        max_output = min(32768, max(1024, self.capacity - 1024 - 1024))
         value = {
             "id": self.id,
             "label": self.label,
@@ -89,6 +91,8 @@ class BackendSpec:
             "recovery": self.recovery,
             "adapter": self.adapter,
             "short_label": self.short_label,
+            "default_output": default_output,
+            "max_output": max_output,
         }
         if self.adapter == GUFO_QWEN_ADAPTER:
             value.update(
@@ -154,7 +158,7 @@ ALL_SPECS = {
         engine="Kirei HIP gfx1151",
         base="http://127.0.0.1:18231",
         model_id="deepseek-v4.1-flash",
-        capacity=12288,
+        capacity=32768,
         concurrency=8,
         thinking_requested="auto",
         thinking_effective="standard",
@@ -390,9 +394,9 @@ def _model_capacity(backend_id: str, timeout: float = 5) -> int:
 
 def effective_capacity(backend_id: str, timeout: float = 5) -> int:
     backend = spec(backend_id)
-    if backend.id in (DEEPSEEK_KIREI, QWEN):
+    if backend.id == QWEN:
         return backend.capacity
-    if backend.adapter == GUFO_QWEN_ADAPTER:
+    if backend.adapter in (GUFO_QWEN_ADAPTER, DEEPSEEK_KIREI_ADAPTER):
         try:
             return _model_capacity(backend.id, timeout=timeout)
         except Exception:
@@ -467,15 +471,16 @@ def count(
             content = m.get("content", "")
             rendered += f"<｜{role.capitalize()}｜>{content}<｜end of sentence｜>"
         input_tokens = len(tok.encode(rendered, add_special_tokens=False).ids)
-        required = input_tokens + output + MARGIN_TOKENS
-        if required > capacity:
+        available_output = capacity - input_tokens - MARGIN_TOKENS
+        if available_output <= 0:
             raise ValueError(
-                f"Context rejected before dispatch: input {input_tokens} + output {output} + "
-                f"margin {MARGIN_TOKENS} = {required}, capacity {capacity}; no truncation"
+                f"Context rejected before dispatch: input {input_tokens} + margin {MARGIN_TOKENS} >= capacity {capacity}; no room for response"
             )
+        effective_output = min(output, available_output)
+        required = input_tokens + effective_output + MARGIN_TOKENS
         measured = {
             "input_tokens": input_tokens,
-            "max_output": output,
+            "max_output": effective_output,
             "margin": MARGIN_TOKENS,
             "required": required,
             "capacity": capacity,
@@ -631,6 +636,8 @@ def status(backend_id: str) -> dict:
     if type(live_capacity) is int and live_capacity > 0:
         result["configured_capacity"] = backend.capacity
         result["capacity"] = live_capacity
+        result["default_output"] = 4096 if live_capacity <= 16384 else (8192 if live_capacity <= 32768 else 32768)
+        result["max_output"] = min(32768, max(1024, live_capacity - 1024 - 1024))
         if live_capacity != backend.capacity:
             errors["capacity"] = (
                 f"live {backend.label} context {live_capacity} differs from configured {backend.capacity}"

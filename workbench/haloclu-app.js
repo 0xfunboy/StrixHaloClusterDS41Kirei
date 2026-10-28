@@ -296,7 +296,7 @@ function updateAssistantMessage(wrapper,job){
 function renderAssistantMessage(job){const wrapper=createAssistantMessage(job);updateAssistantMessage(wrapper,job);return wrapper;}
 function reconcileChatNode(root,key,builder,updater,index){let node=root.querySelector(`[data-message-key="${CSS.escape(key)}"]`);if(!node)node=builder();updater?.(node);const current=root.children[index];if(current!==node)root.insertBefore(node,current||null);return node;}
 function renderChat(){
-  const p=state.project;$('chat-title').textContent=p.title;setBackendBadge($('chat-backend'),p.backend_id);populateJobSelect($('chat-jobs'));reading.syncDraft('chat-prompt','');syncQualityControl('chat');syncReasoningControl();
+  const p=state.project;$('chat-title').textContent=p.title;setBackendBadge($('chat-backend'),p.backend_id);populateJobSelect($('chat-jobs'));reading.syncDraft('chat-prompt','');syncQualityControl('chat');syncReasoningControl();syncCapControl('chat');
   const root=$('chat-conversation'),follow=$('chat-follow'),same=root.dataset.projectId===p.id,snapshot=same?reading.captureChat(root,follow):{mode:reading.get(reading.key('chat-scroll',p.id),{mode:'FOLLOWING'}).mode||'FOLLOWING',anchor:null,offset:0,scrollTop:0};
   if(!same){root.replaceChildren();root.dataset.projectId=p.id;}
   let index=0;const keys=[];
@@ -309,7 +309,7 @@ function renderChat(){
 
 function renderFiles(root,p){root.replaceChildren();const allowed=new Set(p.allowed||[]);for(const [path,content] of Object.entries(p.files||{})){const row=element('div','file-row');row.append(element('span','file-state',allowed.has(path)?'EDIT':'READ'),element('span','file-path',path),element('span','file-state',bytes(new TextEncoder().encode(content).length)));root.append(row);}for(const item of p.excluded||[]){const row=element('div','file-row excluded');row.append(element('span','file-state','SKIP'),element('span','file-path',item.path),element('span','file-state',item.reason));root.append(row);}if(!root.childNodes.length)root.append(element('p','muted','No files.'));}
 function renderCoding(){
-  const p=state.project;reading.syncDraft('coding-prompt','');syncQualityControl('coding');$('coding-project-title').textContent=p.title;setBackendBadge($('coding-backend'),p.backend_id);badge($('coding-kind'),p.kind);$('coding-origin').textContent=p.origin||'Explicit user selection/upload';renderFiles($('coding-files'),p);$('coding-allowlist').textContent=(p.allowed||[]).join('\n')||'No editable files';
+  const p=state.project;reading.syncDraft('coding-prompt','');syncQualityControl('coding');syncCapControl('coding');$('coding-project-title').textContent=p.title;setBackendBadge($('coding-backend'),p.backend_id);badge($('coding-kind'),p.kind);$('coding-origin').textContent=p.origin||'Explicit user selection/upload';renderFiles($('coding-files'),p);$('coding-allowlist').textContent=(p.allowed||[]).join('\n')||'No editable files';
   $('coding-node').hidden=p.kind!=='node';if(p.kind==='node'){$('coding-node-status').textContent=p.node?.dependencies_prepared?`Dependencies prepared. Node ${p.node.node_version}, pnpm ${p.node.pnpm_version}.`:'Dependencies must be prepared before generation.';$('coding-node-checks').replaceChildren(...(p.node?.approved_checks||[]).map(x=>element('span','check-chip',x)));$('coding-prepare').disabled=!!p.node?.dependencies_prepared;}
   populateJobSelect($('coding-jobs'));renderCodingJob(state.job);
 }
@@ -329,7 +329,7 @@ function renderVerification(root,job){
 function renderExports(root,job){const names=(job?.artifacts||[]).filter(name=>name!=='job.json'||state.preferences.show_job_json),signature=JSON.stringify([state.preferences.show_job_json,names]);if(root.__signature===signature)return;root.__signature=signature;root.replaceChildren();if(!names.length){root.append(element('p','muted','No artifacts.'));return;}for(const name of names){const link=element('a','',name);link.href=`/api/jobs/${job.id}/export/${encodeURIComponent(name)}`;link.download=name;root.append(link);}}
 
 function renderWriting(){
-  const p=state.project;reading.syncDraft('writing-prompt','');reading.syncDraft('writing-brief',p.brief||'');reading.syncDraft('writing-outline',p.outline||'');reading.syncDraft('writing-notes',p.continuity_notes||'');syncQualityControl('writing');$('writing-project-title').textContent=p.title;setBackendBadge($('writing-backend'),p.backend_id);renderFiles($('writing-files'),p);populateJobSelect($('writing-jobs'));renderWritingJob(state.job);
+  const p=state.project;reading.syncDraft('writing-prompt','');reading.syncDraft('writing-brief',p.brief||'');reading.syncDraft('writing-outline',p.outline||'');reading.syncDraft('writing-notes',p.continuity_notes||'');syncQualityControl('writing');syncCapControl('writing');$('writing-project-title').textContent=p.title;setBackendBadge($('writing-backend'),p.backend_id);renderFiles($('writing-files'),p);populateJobSelect($('writing-jobs'));renderWritingJob(state.job);
 }
 function renderWritingJob(job){
   const assessment=job?.display_assessment||job?.assessment||{},content=job?.display_content??job?.content??'',reasoningKey=job?reading.detailsKey(job,'primary','writing-reasoning'):null;badge($('writing-status'),job?.status||'idle');badge($('writing-verdict'),assessment.status||'unverified');const cache=metricValues(job).cache;$('writing-cache').textContent=job?`Prefix cache: ${cache}`:'Cache not measured.';renderMarkdown($('writing-chapter'),job?.assembled_chapter||'No complete chapter selected.');renderReasoningContainer($('writing-reasoning'),job?.reasoning||'',reasoningKey);renderMarkdown($('writing-final'),[job?.error?`Status: ${assessment.feedback||job.error}`:'',content].filter(Boolean).join('\n\n')||'No original output.');renderDiff($('writing-diff'),job?.chapter_diff||'');renderWritingChecks(job);renderExports($('writing-exports'),job);updateRecoveryButton('writing',job);$('writing-cancel').disabled=!ACTIVE.has(job?.status);
@@ -348,9 +348,34 @@ function syncReasoningControl(){
   const signature=JSON.stringify(profiles.map(item=>[item.id,item.label,item.available]));if(node.dataset.signature!==signature){const current=node.value;node.dataset.signature=signature;node.replaceChildren(...profiles.filter(item=>item.available!==false).map(item=>{const option=element('option','',item.label||item.id);option.value=item.id;return option;}));if([...node.options].some(item=>item.value===current))node.value=current;}
   if(node.dataset.projectId!==state.project.id){node.dataset.projectId=state.project.id;const previous=state.jobs.at(-1)?.reasoning_effort||state.jobs.at(-1)?.generation_profile?.thinking_effective,stored=reading.get(reading.key('reasoning-effort',state.project.id,'chat'),{value:previous||backend?.reasoning_effort_default||'xhigh'}),fallback=backend?.reasoning_effort_default||'xhigh';node.value=[...node.options].some(item=>item.value===stored.value)?stored.value:fallback;}
 }
+function syncCapControl(view){
+  const node=$(`${view}-cap`);if(!node)return;
+  const backend=backendById(state.project?.backend_id||state.defaultBackend);
+  const cap=Number(backend?.capacity||32768);
+  const maxCap = backend?.max_output ? Number(backend.max_output) : (cap <= 16384 ? 8192 : cap <= 32768 ? 24576 : 32768);
+  const defaultCap = backend?.default_output ? Number(backend.default_output) : (view==='chat' ? (cap <= 32768 ? 4096 : 32768) : (cap <= 32768 ? 8192 : 32768));
+  node.max = String(maxCap);
+  node.min = '128';
+  const currentBackend = backend?.id || '';
+  if(node.dataset.backendId !== currentBackend || !node.value || Number(node.value) > maxCap || Number(node.value) <= 0){
+    node.value = defaultCap;
+    node.dataset.backendId = currentBackend;
+  }
+}
 function selectedReasoningEffort(view){return view==='chat'&&backendUses(state.project?.backend_id,'gufo-qwen')?($('chat-reasoning-effort')?.value||'xhigh'):null;}
 function promptFor(view){return $(`${view}-prompt`).value;}
-function capFor(view){return Number($(`${view}-cap`).value);}
+function capFor(view){
+  const node=$(`${view}-cap`);
+  let val=Number(node?.value||4096);
+  const backend=backendById(state.project?.backend_id||state.defaultBackend);
+  const cap=Number(backend?.capacity||32768);
+  const maxCap = Math.max(512, cap - 1024 - 256);
+  if(val > maxCap){
+    val = maxCap;
+    if(node) node.value = maxCap;
+  }
+  return val;
+}
 function bodyFor(view,revision=false){if(!state.project)throw new Error('Select a project first.');const expected=view==='chat'?['chat']:view==='coding'?['code','node']:['writing'];if(!expected.includes(state.project.kind))throw new Error(`Select a ${view} project.`);const result={project:state.project.id,project_version:state.project.version,instruction:promptFor(view),max_output:capFor(view),quality_profile:selectedQualityProfile(view)};const effort=selectedReasoningEffort(view);if(effort)result.reasoning_effort=effort;if(revision){if(!state.job)throw new Error('Select a completed job first.');result.previous=state.job.id;result.revision_mode=view==='writing'?$('writing-revision-mode').value:'full';}return result;}
 async function meter(view,revision=false){const data=bodyFor(view,revision);if(revision)data.max_output=Math.min(data.max_output,16384);const value=await api('/api/meter',data);$(`${view}-meter`).textContent=`${value.node} · ${value.engine}: input ${number(value.input_tokens,0)} + output ${number(value.max_output,0)} + margin ${number(value.margin,0)} = ${number(value.required,0)} / ${number(value.capacity,0)}.`;}
 async function send(view,revision=false){

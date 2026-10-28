@@ -35,7 +35,7 @@ setsid "$SERVE_BIN" "$BASE_MODEL" \
   --peer-timeout 120 \
   --http-bind 127.0.0.1 --http-port "$API_PORT" \
   --layers 40 --tp-attention --engram-direct \
-  --prefill-path device --prefill-rows 2048 --slots 8 --context 12288 \
+  --prefill-path device --prefill-rows 2048 --slots 2 --context 32768 \
   $([ -f "$DSPARK_MODEL" ] && echo "--dspark $DSPARK_MODEL --dspark-vocab auto:$VOCAB_DIR" || true) \
   > "$COORD_LOG" 2>&1 < /dev/null &
 

@@ -49,7 +49,7 @@ def initialize():
             (STATE/'api-token').write_text(secrets.token_urlsafe(32)+'\n')
         (STATE/'api-token').chmod(0o600)
     if not (STATE/'ledger.json').exists():
-        save(STATE/'ledger.json',{'phase':'ACTIVE','starts':[],'requests':[],'charged_tokens':0})
+        save(STATE/'ledger.json',{'phase':'OPERATIONAL','starts':[],'requests':[],'charged_tokens':0})
 
 
 @contextlib.contextmanager
