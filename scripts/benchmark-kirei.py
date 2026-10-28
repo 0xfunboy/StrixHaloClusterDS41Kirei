@@ -36,7 +36,7 @@ BENCH_PROMPTS = {
 def send_chat_completion(prompt: str, max_tokens: int = 256, temperature: float = 0.0) -> Dict[str, Any]:
     url = f"{API_BASE}/v1/chat/completions"
     payload = {
-        "model": "deepseek41-flash-kirei",
+        "model": "deepseek-v4.1-flash",
         "messages": [
             {"role": "system", "content": "You are a helpful and precise assistant."},
             {"role": "user", "content": prompt},
@@ -57,12 +57,15 @@ def send_chat_completion(prompt: str, max_tokens: int = 256, temperature: float 
     completion_tokens = usage.get("completion_tokens", max_tokens)
     prompt_tokens = usage.get("prompt_tokens", 0)
     tok_per_sec = completion_tokens / elapsed if elapsed > 0 else 0
+    strix_info = body.get("strix", {})
+    strix_decode_tps = strix_info.get("decode_tokens_per_second", tok_per_sec)
 
     return {
         "elapsed_sec": elapsed,
         "completion_tokens": completion_tokens,
         "prompt_tokens": prompt_tokens,
         "tokens_per_sec": tok_per_sec,
+        "strix_decode_tps": strix_decode_tps,
         "content_sample": body["choices"][0]["message"]["content"][:120].strip() if body.get("choices") else "",
     }
 
@@ -140,3 +143,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

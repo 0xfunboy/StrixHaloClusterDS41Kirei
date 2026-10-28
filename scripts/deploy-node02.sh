@@ -22,3 +22,4 @@ ssh -o BatchMode=yes "$REMOTE_NODE" "
 "
 
 echo "=== Deployment to $REMOTE_NODE completed ==="
+
