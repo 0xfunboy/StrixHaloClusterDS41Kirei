@@ -1,0 +1,31 @@
+{
+  "schema": "mimo-primary-selection-fixtures-v1",
+  "source_root": "/home/funboy/.local/state/strixhaloqw38fn/operational-128k/jobs",
+  "independent_suite_sha256": "61e68bad083043e8e21155655ee4c75efcb501f1101086d140da2157559ecf68",
+  "fixtures": {
+    "f0a942d1886838995bf4ed32": {
+      "file": "f0a942d1886838995bf4ed32-primary-final.txt",
+      "content_sha256": "2ab9b3f11817f6c95c61ca0c83e640dcbe0b9bcb5b5f681d6019ab32b21071e2",
+      "native_sse_sha256": "919f74891bdd967ad87b4aa0d89efd8c453066aa5b985f6b91732792e5084ea0",
+      "finish_reason": "stop",
+      "status": "COMPLETE",
+      "prompt_tokens": 9766,
+      "completion_tokens": 15205,
+      "wall_ms": 473109.4333740184,
+      "secure_gateway_sha256": "271470ee66cc3b2d7ab1fd7e4c8edf12510df5e2e55974b83c24fd018c379a20",
+      "test_secure_gateway_sha256": "00cbe3fddd54fbe07f102183479456b00f525dcb63f3dfc68fea6ed7ba9f4603"
+    },
+    "390fa772325b856ca67f220f": {
+      "file": "390fa772325b856ca67f220f-primary-final.txt",
+      "content_sha256": "284be4e653a7bc4d9f750d2196a3cb737da94bbc49d96a48285f2ec308abb464",
+      "native_sse_sha256": "0124f024b73d82abf268346f440ae8359a99b1eff576209de16e4f40f2c380e1",
+      "finish_reason": "stop",
+      "status": "COMPLETE",
+      "prompt_tokens": 2917,
+      "completion_tokens": 12124,
+      "wall_ms": 387184.2221219558,
+      "secure_gateway_sha256": "c2587346c99380c7046beeb5dd7737ad08f4affeba0a0d25b3b3392ae6c4d2f7",
+      "test_secure_gateway_sha256": "a05f427fd1ef33613e63e44b78bd66f541ce88175492e8c926f0af9bc549b162"
+    }
+  }
+}

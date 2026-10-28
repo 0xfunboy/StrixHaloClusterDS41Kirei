@@ -1,0 +1,22 @@
+{
+  "schema": "gufo-node-pnpm-profile-v1",
+  "node": {
+    "path": "/usr/bin/node",
+    "version": "22.22.1",
+    "sha256": "d0efb6fcb9d023ba4e2b160ec2384dc28fe4f17732141ef47f676828fa960505"
+  },
+  "pnpm": {
+    "path": "/home/funboy/.local/state/strixhaloqw38fn/gufo-progetti-reali-001/toolchain/pnpm-12.9.1",
+    "version": "12.9.1",
+    "sha256": "e5cbe9432a815791a541c33aa736d6c66cfc005560397d6c07deb9898947ee96"
+  },
+  "validator_image": "docker.io/library/python@sha256:bab1b7ef4b450c81002278d035eff85ebe394ae94df904f7a3ba14f7e16e487b",
+  "package_manager": "pnpm@12.9.1",
+  "approved_checks": ["typecheck", "build", "test"],
+  "limits": {
+    "timeout_seconds": 180,
+    "memory_bytes": 2147483648,
+    "pids": 256,
+    "cpus": 4
+  }
+}

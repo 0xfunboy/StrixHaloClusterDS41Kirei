@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="no-referrer">
+  <title>HaloClu</title>
+  <meta name="application-name" content="HaloClu">
+  <meta name="description" content="HaloClu AI workbench with DeepSeek V4.1 Flash on Dual AMD Strix Halo cluster.">
+  <link rel="icon" type="image/png" href="/assets/haloclu-icon.png?v=ui002">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=ui002">
+  <link rel="stylesheet" href="/haloclu.css?v=ui002">
+  <link rel="stylesheet" href="/haloclu-workbench.css?v=ui007">
+  <script type="module" src="/haloclu-app.js?v=ui013"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to workspace</a>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="HaloClu navigation">
+    <div class="sidebar-heading">
+      <a class="brand" href="/" aria-label="HaloClu home">
+        <img class="brand-wordmark" src="/assets/haloclu-horizontal.png?v=ui002" alt="HaloClu" width="2508" height="627">
+        <img class="brand-icon" src="/assets/haloclu-icon.png?v=ui002" alt="" width="800" height="800">
+      </a>
+      <button class="icon-button" id="sidebar-collapse" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">‹</button>
+    </div>
+
+    <nav class="nav-tabs" aria-label="Sections">
+      <button class="nav-item active" id="tab-chat" data-tab="chat" type="button"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Chat</span></button>
+      <button class="nav-item" id="tab-coding" data-tab="coding" type="button"><span class="nav-icon" aria-hidden="true">{}</span><span class="nav-label">Coding</span></button>
+      <button class="nav-item" id="tab-writing" data-tab="writing" type="button"><span class="nav-icon" aria-hidden="true">¶</span><span class="nav-label">Writing</span></button>
+      <button class="nav-item" id="tab-models" data-tab="models" type="button"><span class="nav-icon" aria-hidden="true">◇</span><span class="nav-label">Models</span></button>
+      <button class="nav-item" id="tab-benchmark" data-tab="benchmark" type="button"><span class="nav-icon" aria-hidden="true">≡</span><span class="nav-label">Benchmark</span></button>
+      <button class="nav-item" id="tab-cluster" data-tab="cluster" type="button"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Cluster</span></button>
+      <button class="nav-item" id="tab-options" data-tab="options" type="button"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Options</span></button>
+    </nav>
+
+    <section class="sidebar-conversations" aria-label="Projects">
+      <div class="sidebar-section-title"><h2>Projects</h2><button class="icon-button" id="new-project" type="button" aria-label="New project" title="New project">+</button></div>
+      <button class="button quiet full-width sidebar-new-chat" id="new-chat" type="button">New conversation</button>
+      <label class="sr-only" for="project-search">Search conversations</label><input id="project-search" class="project-search" type="search" placeholder="Search conversations…" autocomplete="off">
+      <div id="project-list" class="project-list"><p class="control-hint">Sign in to load projects.</p></div>
+    </section>
+
+    <section class="sidebar-settings compact-settings" aria-label="Current request settings">
+      <h2>Generation</h2>
+      <dl class="sidebar-facts"><dt>Backend</dt><dd id="sidebar-backend">Select a conversation</dd><dt>Reasoning</dt><dd id="sidebar-thinking">—</dd><dt>Context</dt><dd id="sidebar-context">—</dd><dt>Engine</dt><dd id="sidebar-engine">—</dd></dl>
+      <p class="control-hint" id="sidebar-recovery">The model is fixed to each conversation. Open a branch to change backend.</p>
+    </section>
+
+    <div class="sidebar-bottom">
+      <button class="connection-button" id="connection-toggle" type="button"><span class="status-dot" id="connection-dot"></span><span class="nav-label" id="connection-label">Not connected</span></button>
+    </div>
+  </aside>
+
+  <main class="workspace" id="main">
+    <header class="topbar">
+      <div class="topbar-left"><button class="icon-button" id="sidebar-toggle" type="button" aria-label="Toggle sidebar" aria-expanded="true">☰</button><strong id="view-label">Chat</strong></div>
+      <div class="topbar-right"><label class="sr-only" for="model-selector">Model</label><select class="model-selector" id="model-selector" aria-label="Model"><option value="">Loading models…</option></select><button class="icon-button" id="refresh" type="button" aria-label="Refresh status" title="Refresh status">↻</button></div>
+    </header>
+    <div id="global-notice" class="notice" role="status" hidden></div>
+
+    <section id="panel-chat" class="panel chat-panel" data-panel="chat">
+      <div class="conversation-actions">
+        <div><span class="eyebrow">Conversation</span><strong id="chat-title">New conversation</strong><span class="backend-badge" id="chat-backend">NO BACKEND</span></div>
+        <div class="button-row"><button class="button quiet small-button" id="chat-copy-conversation" type="button">Copy conversation</button><button class="button quiet small-button" id="chat-export-conversation" type="button">Export JSON</button><button class="button danger small-button" id="chat-delete-conversation" type="button">Delete</button><select id="chat-jobs" class="job-select" aria-label="Saved chat response"><option value="">Saved responses</option></select><button class="button quiet small-button" id="chat-branch" type="button" hidden>Open with other model</button><button class="button quiet small-button" id="chat-project-settings" type="button" hidden>Duplicate conversation</button></div>
+      </div>
+      <div class="conversation" id="chat-conversation" role="log" aria-label="Conversation"><div class="empty-chat"><h1>New conversation</h1><p>Select or create a Chat project, then send a message. Coding and Writing use their dedicated views.</p></div></div>
+      <button class="button quiet follow-output" id="chat-follow" type="button" hidden>New content · Follow output</button>
+      <div class="chat-metrics live-chat-metrics" id="chat-metrics" aria-live="polite" hidden></div>
+      <form class="composer" id="chat-form">
+        <label class="sr-only" for="chat-prompt">Message</label><textarea id="chat-prompt" rows="3" placeholder="Write a message…" required></textarea>
+        <div class="composer-footer"><div class="composer-options"><label>Output budget <input id="chat-cap" type="number" min="1" max="32768" value="32768"></label><label class="qwen-reasoning-control">Thinking <select id="chat-reasoning-effort"><option value="low">Low</option><option value="medium">Medium</option><option value="xhigh" selected>XHigh</option></select></label><label class="quality-profile-control" hidden>MiMo profile <select id="chat-quality-profile"><option value="standard">Standard</option><option value="accurate-v1">Accurato · verifica limitata</option></select></label><button class="button quiet small-button" id="chat-count" type="button">Count tokens</button><span class="small muted" id="chat-meter">Margin 1024 tokens.</span></div><div class="button-row"><button class="button quiet" id="chat-recover" type="button" hidden>Recover final</button><button class="button quiet" id="chat-revise" type="button">Correct response</button><button class="button danger" id="chat-cancel" type="button">Cancel request</button><button class="button primary" id="chat-send" type="submit">Send</button></div></div>
+      </form>
+    </section>
+
+    <section id="panel-coding" class="panel" data-panel="coding" hidden>
+      <div class="section-heading"><div><span class="eyebrow">Supervised workspace</span><h1>Coding</h1><p>Go and Node.js/TypeScript projects use immutable bases, exact edits, isolated checks and manual patch application.</p></div><button class="button quiet" id="coding-new-project" type="button">Import project</button></div>
+      <div class="coding-layout haloclu-coding-layout">
+        <aside class="surface project-context">
+          <div class="surface-title"><h2 id="coding-project-title">Select a coding project</h2><div class="badge-row"><span class="backend-badge" id="coding-backend">NO BACKEND</span><span class="badge neutral" id="coding-kind">NONE</span></div></div>
+          <p class="small muted" id="coding-origin">No project selected.</p>
+          <div class="context-section"><h3>Files</h3><div id="coding-files" class="file-summary"><p class="muted">No files.</p></div></div>
+          <div class="context-section"><h3>Editable allowlist</h3><pre id="coding-allowlist">—</pre></div>
+          <section id="coding-node" class="node-card" hidden><h3>Node / TypeScript / pnpm</h3><p class="small muted" id="coding-node-status">Dependencies not prepared.</p><div id="coding-node-checks" class="check-chips"></div><button class="button quiet full-width" id="coding-prepare" type="button">Prepare pinned dependencies</button></section>
+          <div class="button-row context-actions"><button class="button quiet" id="coding-branch" type="button" hidden>Open with other model</button><button class="button quiet" id="coding-export-project" type="button">Export project</button><button class="button quiet" id="coding-open-project" type="button">Duplicate project</button></div>
+        </aside>
+        <div class="coding-results">
+          <section class="surface runner-surface">
+            <div class="surface-title"><h2>Instruction</h2><select id="coding-jobs" class="job-select" aria-label="Saved coding job"><option value="">Saved jobs</option></select></div>
+            <textarea id="coding-prompt" rows="5" placeholder="Describe the repository change and expected outcome."></textarea>
+            <div class="runner-controls"><label>Output budget <input id="coding-cap" type="number" min="1" max="32768" value="32768"></label><label class="quality-profile-control" hidden>MiMo profile <select id="coding-quality-profile"><option value="standard">Standard</option><option value="accurate-v1">Accurato · verifica limitata</option></select></label><button class="button quiet" id="coding-count" type="button">Count tokens</button><button class="button quiet" id="coding-recover" type="button" hidden>Recover final</button><button class="button quiet" id="coding-revise" type="button">Correct candidate</button><button class="button danger" id="coding-cancel" type="button">Cancel request</button><button class="button primary" id="coding-send" type="button">Generate candidate</button></div>
+            <p class="prompt-meter" id="coding-meter">No silent truncation. Internal reasoning is not replayed.</p>
+          </section>
+          <section class="surface result-surface">
+            <div class="surface-title"><h2>Result</h2><span class="badge neutral" id="coding-status">IDLE</span></div>
+            <div class="result-metrics" id="coding-metrics"><div><span>Prefill</span><strong>—</strong></div><div><span>Decode</span><strong>—</strong></div><div><span>TTFT</span><strong>—</strong></div><div><span>Workflow</span><strong>—</strong></div></div>
+            <details class="reasoning-details"><summary>Reasoning</summary><div id="coding-reasoning" class="message-content"></div></details>
+            <h3>Original model output</h3><div id="coding-final" class="message-content output-document"></div>
+          </section>
+          <section class="surface verification-surface"><div class="surface-title"><h2>Independent verification</h2><span class="badge neutral" id="coding-verdict">UNVERIFIED</span></div><div id="coding-checks" class="verification-list"><p class="muted">No verification result.</p></div></section>
+          <section class="surface diff-surface"><div class="surface-title"><h2>Client-generated diff</h2><button class="button quiet small-button copy-button" data-copy-target="coding-diff" type="button">Copy</button></div><pre class="diff" id="coding-diff">No candidate patch.</pre></section>
+          <section class="surface"><h2>Exports</h2><div id="coding-exports" class="export-list"><p class="muted">No artifacts.</p></div></section>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-writing" class="panel" data-panel="writing" hidden>
+      <div class="section-heading"><div><span class="eyebrow">Editorial workspace</span><h1>Writing</h1><p>Corpus, exact citations, targeted revisions and complete rewrites remain bound to the saved parent.</p></div><button class="button quiet" id="writing-new-project" type="button">Import corpus</button></div>
+      <div class="writing-layout">
+        <aside class="surface writing-context">
+          <div class="surface-title"><h2 id="writing-project-title">Select a writing project</h2><div class="badge-row"><span class="backend-badge" id="writing-backend">NO BACKEND</span><span class="badge neutral" id="writing-status">IDLE</span></div></div>
+          <label for="writing-brief">Brief</label><textarea id="writing-brief" rows="5"></textarea>
+          <label for="writing-outline">Outline</label><textarea id="writing-outline" rows="4"></textarea>
+          <label for="writing-notes">Continuity notes</label><textarea id="writing-notes" rows="4"></textarea>
+          <button class="button quiet full-width" id="writing-save-notes" type="button">Save project notes</button><button class="button quiet full-width" id="writing-branch" type="button" hidden>Open with other model</button>
+          <div class="context-section"><h3>Corpus</h3><div id="writing-files" class="file-summary"><p class="muted">No corpus selected.</p></div></div>
+        </aside>
+        <div class="writing-main">
+          <section class="surface runner-surface">
+            <div class="surface-title"><h2>Instruction or revision</h2><select id="writing-jobs" class="job-select"><option value="">Saved revisions</option></select></div>
+            <textarea id="writing-prompt" rows="4" placeholder="Describe the chapter or the requested correction."></textarea>
+            <div class="runner-controls"><label>Output budget <input id="writing-cap" type="number" min="1" max="32768" value="32768"></label><label class="quality-profile-control" hidden>MiMo profile <select id="writing-quality-profile"><option value="standard">Standard</option><option value="accurate-v1">Accurato · verifica limitata</option></select></label><label>Revision mode <select id="writing-revision-mode"><option value="targeted">Exact passage edits</option><option value="full">Complete rewrite</option></select></label><button class="button quiet" id="writing-count" type="button">Count tokens</button><button class="button quiet" id="writing-recover" type="button" hidden>Recover final</button><button class="button quiet" id="writing-revise" type="button">Create revision</button><button class="button danger" id="writing-cancel" type="button">Cancel request</button><button class="button primary" id="writing-send" type="button">Generate chapter</button></div>
+            <p class="prompt-meter" id="writing-meter">No silent truncation. Citation checks are mechanical, not editorial approval.</p>
+          </section>
+          <article class="surface reading-surface"><div class="surface-title"><h2>Complete chapter</h2><span class="small muted" id="writing-cache">Cache not measured.</span></div><div id="writing-chapter" class="message-content reading-document"><p class="muted">No chapter selected.</p></div></article>
+          <section class="surface"><div class="surface-title"><h2>Citations and checks</h2><span class="badge neutral" id="writing-verdict">UNVERIFIED</span></div><div id="writing-checks" class="verification-list"><p class="muted">No verification result.</p></div></section>
+          <section class="surface diff-surface"><div class="surface-title"><h2>Revision diff</h2><button class="button quiet small-button copy-button" data-copy-target="writing-diff" type="button">Copy</button></div><pre class="diff" id="writing-diff">No revision diff.</pre></section>
+          <details class="surface raw-details"><summary>Reasoning and original model output</summary><h3>Reasoning</h3><div id="writing-reasoning" class="message-content"></div><h3>Original output</h3><div id="writing-final" class="message-content"></div></details>
+          <section class="surface"><h2>Exports</h2><div id="writing-exports" class="export-list"><p class="muted">No artifacts.</p></div></section>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-models" class="panel" data-panel="models" hidden>
+      <div class="section-heading"><div><span class="eyebrow">Resident engines</span><h1>Models</h1><p>Both resident backends are available through HaloClu. A model is fixed to each conversation before dispatch.</p></div></div>
+      <div class="model-grid" id="models-backends"><section class="surface"><p class="muted">Loading backend registry…</p></section></div>
+      <section class="surface unavailable-surface"><h2>Boundaries</h2><p>No downloads, lifecycle controls, hidden fallback or automatic cross-model routing are exposed here. Qwen recovery remains Qwen-only; MiMo runs the verified 128K comparison profile (131072 shared tokens).</p></section>
+    </section>
+
+    <section id="panel-benchmark" class="panel" data-panel="benchmark" hidden>
+      <div class="section-heading"><div><span class="eyebrow">Recorded evidence only</span><h1>Benchmark</h1><p>The Gufo workbench does not expose benchmark execution or download operations through this interface.</p></div></div>
+      <section class="surface unavailable-surface"><span class="badge neutral">NOT CONNECTED</span><h2>Benchmark controls intentionally unavailable</h2><p>Historical measurements remain in their reports. Restoring HaloClu does not run a benchmark, download a model, or reactivate the legacy gateway operations API.</p><p class="small muted">Use the qualified operator workflows outside this frontend when a separately authorized benchmark is required.</p></section>
+    </section>
+
+    <section id="panel-cluster" class="panel" data-panel="cluster" hidden>
+      <div class="section-heading"><div><span class="eyebrow">Local deployment</span><h1>Cluster</h1><p>Runtime state comes from the current workbench API. No lifecycle control is exposed here.</p></div></div>
+      <div class="cluster-nodes"><section class="surface"><div class="node-title"><div><h2>NODE 01 · 01-EVO-X3</h2><p class="node-address">Dual Cluster Coordinator · Kirei HIP</p></div><span class="badge neutral" id="node01-state">UNKNOWN</span></div><dl class="settings-details" id="node01-details"></dl></section><section class="surface"><div class="node-title"><div><h2>NODE 02 · 02-EVO-X3</h2><p class="node-address">Dual Cluster Worker · High-speed USB4 Link</p></div><span class="badge neutral" id="node02-state">UNKNOWN</span></div><dl class="settings-details" id="node02-details"></dl></section></div>
+      <details class="surface raw-details"><summary>Current workbench status payload</summary><pre id="cluster-json">Not loaded.</pre></details>
+    </section>
+
+    <section id="panel-options" class="panel options-panel" data-panel="options" hidden>
+      <div class="section-heading"><h1>Options</h1><button class="button quiet" id="options-refresh" type="button">Refresh status</button></div>
+      <div class="options-grid">
+        <section class="surface options-section"><h2>Interface</h2><p class="small muted">Only non-sensitive display preferences are stored in this browser.</p><label>Language<select id="ui-language"><option value="en">English</option><option value="it">Italiano</option></select></label><label>Conversation text size<select id="ui-text-size"><option value="14">Standard · 14 px</option><option value="16">Large · 16 px</option><option value="18">Larger · 18 px</option></select></label><label>Layout density<select id="ui-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><label class="checkbox-label"><input id="show-thinking" type="checkbox"> Expand reasoning by default</label><label class="checkbox-label"><input id="auto-send" type="checkbox" checked> Enter sends in Chat; Shift+Enter adds a new line</label><label class="checkbox-label"><input id="show-delivery-attempts" type="checkbox"> Show delivery attempts</label><label class="checkbox-label"><input id="show-job-json" type="checkbox"> Show technical job.json export</label><label class="checkbox-label"><input id="ui-sidebar-collapsed" type="checkbox"> Collapse sidebar</label></section>
+        <section class="surface options-section"><h2>Connection</h2><p class="small muted">The token is submitted once and never stored in browser storage. The existing HttpOnly <code>gufo_session</code> cookie is preserved.</p><label for="api-token">Local access token</label><input id="api-token" type="password" autocomplete="off"><div class="button-row"><button class="button primary" id="login" type="button">Sign in</button><button class="button quiet" id="connection-refresh" type="button">Check session</button></div><p id="auth-result" class="small">Not authenticated.</p></section>
+        <section class="surface options-section"><h2>Generation contracts</h2><div id="options-backends"><p class="muted">Loading backend contracts…</p></div><p class="small muted">Each conversation keeps its own backend. Reasoning, KV/cache state and payloads are never transferred between models.</p></section>
+        <section class="surface options-section"><h2>Product boundaries</h2><p>Gufo is the engine. HaloClu is the interface.</p><ul class="boundary-list"><li>No direct model API calls from the browser.</li><li>No GLM/Pi gateway, SSH shell, Direct mode or Apply-to-original.</li><li>No benchmark, download or lifecycle controls in this deployment.</li><li>Patch application remains manual and external.</li></ul></section>
+      </div>
+    </section>
+
+    <p id="error" class="global-error" role="alert"></p>
+  </main>
+</div>
+
+<dialog id="project-dialog" class="project-dialog">
+  <form method="dialog" class="dialog-shell" id="project-form">
+    <div class="surface-title"><h2>New HaloClu project</h2><button class="icon-button" value="cancel" aria-label="Close">×</button></div>
+    <div class="example-strip"><span class="small muted">Examples</span><button class="button quiet small-button" id="example-code" type="button">Go CODE-64</button><button class="button quiet small-button" id="example-node" type="button">Node/TS demo</button><button class="button quiet small-button" id="example-writing" type="button">Writing BOOK-128</button></div>
+    <div class="dialog-grid"><label>Workflow<select id="project-kind"><option value="chat">Chat</option><option value="code">Go / exact code edits</option><option value="node">Node.js / TypeScript / pnpm</option><option value="writing">Writing</option></select></label><label>Model<select id="project-backend"><option value="deepseek-kirei">DeepSeek V4.1 Flash · Dual Strix · 12288</option><option value="qwen-gufo">Qwen3.8-Flash-Next · NODE01 · 196608</option><option value="mimo-kyojin">MiMo-V2.6-Flash-MOPD · NODE02 · 131072</option></select></label></div><label>Project title<input id="project-title" value="Untitled"></label>
+    <label>Brief<textarea id="project-brief" rows="3"></textarea></label>
+    <div class="dialog-grid"><label>Choose working directory<input id="project-directory" type="file" webkitdirectory multiple></label><label>Or select text files<input id="project-files" type="file" multiple></label></div>
+    <div id="project-file-list" class="file-summary"><p class="muted">No files selected.</p></div>
+    <label>Editable paths, one per line<textarea id="project-allowed" rows="4"></textarea></label>
+    <fieldset id="project-node-settings"><legend>Operator-approved Node package scripts</legend><label class="checkbox-label"><input id="project-check-typecheck" type="checkbox" checked> typecheck</label><label class="checkbox-label"><input id="project-check-build" type="checkbox" checked> build</label><label class="checkbox-label"><input id="project-check-test" type="checkbox" checked> test</label></fieldset>
+    <div class="button-row dialog-actions"><button class="button quiet" value="cancel">Cancel</button><button class="button primary" id="project-save" type="button">Create isolated project</button></div>
+  </form>
+</dialog>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[Unit]
+Description=Gufo supervised local workbench
+After=network.target qwen-gufo.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=/home/funboy/StrixHaloQw38FN
+ExecStart=/home/funboy/StrixHaloClusterGLM/.engine/venv/bin/python /home/funboy/StrixHaloQw38FN/runtime/gufo/workbench/app.py
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=120
+NoNewPrivileges=yes
+
+# Manual user lifecycle only. Not enabled at boot.

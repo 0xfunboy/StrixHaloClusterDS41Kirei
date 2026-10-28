@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gufo Workbench</title><link rel="stylesheet" href="/style.css"></head>
+<body><aside><h1>Gufo</h1><p>Local workbench</p><button id="new">New project</button><button id="code-example">Load CODE-64 example</button><button id="node-example">Load Node/TS demo</button><button id="book-example">Load BOOK-128 example</button><select id="projects"><option>Select saved project</option></select><label>Workflow<select id="kind"><option value="chat">Chat</option><option value="code">Exact Go/code edits</option><option value="node">Node.js / TypeScript (pnpm)</option><option value="writing">Writing</option></select></label><label>Project title<input id="title" value="Untitled"></label><label>Choose working directory<input id="directory" type="file" webkitdirectory multiple></label><label>Or select text files<input id="files" type="file" multiple></label><pre id="file-list"></pre><label>Editable paths, one per line<textarea id="allowed" rows="3"></textarea></label><div id="node-profile" hidden><p>Node 22.22.1 · pnpm 12.9.1 · single package · dependencies prepared separately with lifecycle scripts disabled.</p><label><input id="check-typecheck" type="checkbox" checked> Approve package script: typecheck</label><label><input id="check-build" type="checkbox" checked> Approve package script: build</label><label><input id="check-test" type="checkbox" checked> Approve package script: test</label><button id="prepare-node" type="button">Prepare pnpm dependencies</button><pre id="node-status">Save the project, then prepare dependencies before generation.</pre></div><button id="save-project">Save project</button><button id="export-project">Export project</button><hr><label>Access token<input id="token" type="password" autocomplete="off"></label><button id="login">Sign in</button><p id="auth">Session persists across reloads. Token stays out of browser storage.</p></aside>
+<main>
+<header><h2 id="heading">Gufo Workbench</h2><span id="service">Checking connection</span><button id="refresh">Refresh</button></header>
+<div id="notice">Supervised use. HIGH requested = xhigh effective. Output budgets include reasoning. No autonomous production edits.</div>
+<section><label>Brief<textarea id="brief" rows="3"></textarea></label>
+<div class="two"><label>Outline<textarea id="outline" rows="2"></textarea></label><label>Continuity notes<textarea id="notes" rows="2"></textarea></label></div>
+<button id="save-notes">Save writing notes</button></section>
+<section><label>Instruction or correction feedback<textarea id="prompt" rows="4"></textarea></label>
+<div class="controls"><label>Output budget<input id="cap" type="number" min="1" max="32768" value="32768"></label>
+<label>Writing revision<select id="revision-mode"><option value="targeted">Exact passage edits</option><option value="full">Complete rewrite</option></select></label>
+<button id="count">Count new input</button><button id="count-revision">Count correction input</button><button id="send">Generate</button><button id="revise">Correct previous output</button><button id="cancel">Cancel own request</button></div>
+<p id="meter">No silent truncation. Margin1024 tokens. Internal reasoning is not replayed.</p><p id="performance"></p><p id="cache"></p></section>
+<section><label>Saved job/revision<select id="jobs"><option>Select job</option></select></label><h3 id="phase">Ready</h3>
+<details><summary>Reasoning</summary><pre id="reasoning"></pre></details><h3>Original model output</h3><pre id="final"></pre>
+<div id="writing-artifact" hidden><h3>Complete chapter</h3><pre id="chapter"></pre><details><summary>Client-generated revision diff</summary><pre id="chapter-diff"></pre></details></div>
+<h3>Verification</h3><pre id="checks"></pre><div id="exports"></div></section>
+<p id="error" role="alert"></p></main><script src="/app.js"></script></body></html>

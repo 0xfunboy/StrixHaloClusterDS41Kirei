@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="no-referrer">
+  <title>HaloClu</title>
+  <meta name="application-name" content="HaloClu">
+  <meta name="description" content="Local AI chat and Pi coding workspaces on paired AMD Strix Halo. Manage model downloads, inspect benchmarks and monitor your cluster from one lightweight interface.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="HaloClu">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="HaloClu — Local AI on paired Strix Halo">
+  <meta property="og:description" content="Chat, Pi coding workspaces, resumable model downloads and cluster diagnostics in one lightweight local interface.">
+  <meta property="og:image" content="./assets/haloclu-social.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1729">
+  <meta property="og:image:height" content="910">
+  <meta property="og:image:alt" content="HaloClu: linked off-white pillars with an orange bridge on charcoal, with Local AI. Paired Strix Halo. and Chat, Pi coding, Models.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HaloClu — Local AI on paired Strix Halo">
+  <meta name="twitter:description" content="Chat, Pi coding workspaces, resumable model downloads and cluster diagnostics in one lightweight local interface.">
+  <meta name="twitter:image" content="./assets/haloclu-social.png">
+  <meta name="twitter:image:alt" content="HaloClu — Local AI. Paired Strix Halo.">
+  <!-- HALOCLU_PUBLIC_METADATA -->
+  <link rel="icon" type="image/png" sizes="800x800" href="./assets/haloclu-icon.png?v=10">
+  <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="./favicon.ico?v=10">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to conversation</a>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Navigation and settings">
+    <div class="sidebar-heading"><a href="./" class="brand" aria-label="HaloClu home"><img class="brand-wordmark" src="./assets/haloclu-horizontal.png?v=10" alt="HaloClu" width="2508" height="627"><img class="brand-icon" src="./assets/haloclu-icon.png?v=10" alt="" width="800" height="800"></a><button class="icon-button" id="sidebar-collapse" aria-label="Collapse sidebar" title="Collapse sidebar">‹</button></div>
+    <nav class="nav-tabs" role="tablist" aria-label="Sections">
+      <button class="nav-item active" id="tab-chat" role="tab" aria-selected="true" aria-controls="panel-chat" data-tab="chat" aria-label="Chat" title="Chat"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Chat</span></button>
+      <button class="nav-item" id="tab-workspace" role="tab" aria-selected="false" aria-controls="panel-workspace" data-tab="workspace" tabindex="-1" aria-label="Coding workspace" title="Coding workspace"><span class="nav-icon" aria-hidden="true">{}</span><span class="nav-label">Coding</span></button>
+      <button class="nav-item" id="tab-models" role="tab" aria-selected="false" aria-controls="panel-models" data-tab="models" tabindex="-1" aria-label="Models" title="Models"><span class="nav-icon" aria-hidden="true">◇</span><span class="nav-label">Models</span></button>
+      <button class="nav-item" id="tab-benchmarks" role="tab" aria-selected="false" aria-controls="panel-benchmarks" data-tab="benchmarks" tabindex="-1" aria-label="Benchmark" title="Benchmark"><span class="nav-icon" aria-hidden="true">≡</span><span class="nav-label">Benchmark</span></button>
+      <button class="nav-item" id="tab-cluster" role="tab" aria-selected="false" aria-controls="panel-cluster" data-tab="cluster" tabindex="-1" aria-label="Cluster" title="Cluster"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Cluster</span></button>
+      <button class="nav-item" id="tab-coding" role="tab" aria-selected="false" aria-controls="panel-coding" data-tab="coding" tabindex="-1" aria-label="Advanced legacy coding" title="Advanced legacy coding" hidden><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Advanced / legacy</span></button>
+      <button class="nav-item" id="tab-options" role="tab" aria-selected="false" aria-controls="panel-options" data-tab="options" tabindex="-1" aria-label="Options" title="Options"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Options</span></button>
+    </nav>
+    <section class="sidebar-settings" id="generation-settings" aria-label="Request settings">
+      <h2>Generation</h2>
+      <label for="reasoning-mode"><span id="reasoning-request-label">Reasoning</span><span id="reasoning-workspace-label" hidden>Reasoning for new sessions</span></label><select id="reasoning-mode" disabled><option value="low">low</option><option value="high">high</option><option value="max">max</option></select>
+      <p class="control-hint">Low does not disable thinking.</p>
+      <p class="control-hint" id="generation-workspace-note" hidden>Applied when you create a Pi session. Existing sessions keep their captured reasoning. Chat context, output and thinking-budget controls are not passed to Pi.</p>
+      <div id="generation-chat-controls">
+      <label for="thinking-budget">Thinking budget</label><select id="thinking-budget" disabled><option value="">Natural · no added cap</option><option value="0">0 · force reasoning closure</option><option value="128">128 token</option><option value="512">512 token</option><option value="2048">2048 token</option></select>
+      <p class="control-hint">A cap changes generation; equivalent quality is not guaranteed.</p>
+      <label for="context-select">Context window</label><select id="context-select" disabled><option value="8192">8K · 8192 token</option></select>
+      <p class="control-hint">Chat: input + output. Legacy coding: source-selection budget. Does not resize KV.</p>
+      <label for="chat-cap">Response limit (includes thinking)</label><select id="chat-cap" disabled><option value="">Auto · default server</option><option value="4096">4K</option><option value="8192">8K</option><option value="16384">16K</option><option value="32768">32K</option></select>
+      <p class="control-hint" id="generation-limits">Waiting for server settings.</p>
+      <p class="control-hint" id="profile-note">Settings take effect when you submit a request.</p>
+      </div>
+    </section>
+    <section class="sidebar-conversations" aria-label="Local conversations">
+      <div class="sidebar-section-title"><h2>Conversations</h2><button class="icon-button" id="clear-chat" aria-label="New conversation" title="New conversation">+</button></div>
+      <div id="conversation-list"></div><div class="button-row"><button class="button quiet small-button" id="refresh-conversations" type="button">Refresh</button><button class="button quiet small-button" id="rename-conversation" type="button">Rename</button><button class="button danger small-button" id="delete-conversation" type="button">Delete…</button></div><div class="button-row"><button class="button quiet small-button" id="export-chat" type="button">Export JSON</button><label class="button quiet small-button" for="import-conversation">Import JSON</label><input id="import-conversation" class="sr-only" type="file" accept=".json,application/json"></div><p class="control-hint" id="conversation-note">Saved on this server. Shared between Chat and Pi. Delete removes owned history files from both views.</p>
+    </section>
+    <div class="sidebar-bottom"><button class="connection-button" id="connection-toggle" aria-controls="panel-options"><span class="status-dot" id="connection-dot"></span><span class="nav-label" id="connection-label">Not connected</span></button></div>
+  </aside>
+  <main class="workspace" id="main">
+    <header class="topbar"><div class="topbar-left"><button class="icon-button" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="sidebar">☰</button><strong id="view-label">Chat</strong></div><div class="topbar-right"><span id="model-pill" class="model-pill">Waiting for connection</span><button class="icon-button" id="open-connection" aria-label="Token and connection" title="Token and connection">⌁</button><button class="icon-button" id="refresh-health" aria-label="Refresh status" title="Refresh status">↻</button></div></header>
+    <div id="global-notice" class="notice" role="status" hidden></div>
+
+    <section id="panel-options" class="panel options-panel" role="tabpanel" aria-labelledby="tab-options" hidden>
+      <div class="section-heading"><h1>Options</h1><button class="button quiet" id="refresh-settings" type="button">Refresh server settings</button></div>
+      <div class="options-grid">
+        <section class="surface options-section"><h2>Interface</h2><p class="small muted">Saved in this browser. These preferences do not change model generation.</p>
+          <label for="ui-language">Language</label><select id="ui-language"><option value="en">English</option><option value="it">Italiano</option></select>
+          <label for="ui-text-size">Conversation text size</label><select id="ui-text-size"><option value="14">Standard · 14 px</option><option value="16">Large · 16 px</option><option value="18">Larger · 18 px</option></select>
+          <label for="ui-density">Layout density</label><select id="ui-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select>
+          <label class="checkbox-label"><input id="show-thinking" type="checkbox"> Expand thinking while responding</label>
+          <label class="checkbox-label"><input id="ui-sidebar-collapsed" type="checkbox"> Collapse sidebar</label>
+          <label class="checkbox-label"><input id="ui-show-advanced" type="checkbox"> Show Advanced / legacy in navigation</label>
+          <p class="small muted">Optional snapshot/build/test fallback. Hiding the page does not disable its API or discard existing tasks.</p>
+          <p class="small muted">Thinking display only. Reasoning effort and token budgets remain under Generation.</p>
+        </section>
+        <section class="surface options-section connection-panel" id="connection-panel" aria-label="API authentication"><h2>Connection and secrets</h2><form id="connection-form">
+          <div><label for="api-token">Local API token</label><p class="small muted">Enter once. This browser stays signed in for 180 days using an HttpOnly session cookie, not the API token.</p></div><input id="api-token" type="password" autocomplete="off" spellcheck="false" placeholder="Local token · needed only for first sign-in" aria-describedby="connection-result">
+          <div class="button-row"><button class="button primary" type="submit">Connect</button><button class="button quiet" type="button" id="forget-token">Forget</button><button class="button quiet" type="button" id="copy-api-token">Copy token</button></div>
+        </form><p id="connection-result" class="small" role="status">No external services.</p>
+          <div class="secret-action"><button class="button danger" id="rotate-api-token" type="button" disabled>Rotate API token…</button><p class="small muted">Creates a new server token. Other clients must reconnect with it. Does not change SSH keys or passwords.</p></div>
+        </section>
+        <section class="surface options-section api-options"><h2>Exposed APIs</h2><p class="small muted" id="settings-api-note">Connect to inspect the server's API controls.</p><form id="api-settings-form"><fieldset id="api-settings-fields" disabled>
+          <label class="checkbox-label"><input id="api-chat" type="checkbox"> Chat and tool completions</label>
+          <label class="checkbox-label"><input id="api-workspaces" type="checkbox"> Coding workspace / Pi</label>
+          <label class="checkbox-label"><input id="api-legacy-coding" type="checkbox"> Advanced / legacy coding</label>
+          <label class="checkbox-label"><input id="api-operations" type="checkbox"> Benchmarks and download operations</label>
+          <button class="button primary" type="submit">Save API settings…</button>
+        </fieldset></form><p id="settings-result" class="small" role="status">Server settings not loaded.</p></section>
+        <section class="surface options-section"><h2>Server configuration</h2><dl class="settings-details"><dt>Listening address</dt><dd id="settings-listen">—</dd><dt>Backend</dt><dd id="settings-backend">—</dd><dt>Active model</dt><dd id="settings-model">—</dd></dl><p class="small muted" id="settings-network-note">Network binding and backend are managed by the server configuration. Changing them requires a gateway restart, not a rank restart.</p></section>
+      </div>
+    </section>
+
+    <section id="panel-chat" class="panel chat-panel" role="tabpanel" aria-labelledby="tab-chat">
+      <div class="button-row conversation-actions"><button class="button quiet small-button" id="chat-to-pi" type="button">Continue in Coding / Pi</button><span class="small muted" id="conversation-title">New conversation</span></div>
+      <div class="conversation" id="conversation" role="log" aria-label="Conversation" aria-live="off"><div class="empty-chat" id="chat-empty"><h1>New conversation</h1><p>Send a message. For repository work, open <button class="inline-link" data-go-coding>Coding</button>.</p></div></div>
+      <div class="chat-metrics" aria-label="Response metrics"><span>Decode TPS <strong id="chat-tps">—</strong></span><span>HTTP TPS <strong id="chat-live-tps">—</strong></span><span>TTFT <strong id="chat-ttft">—</strong></span><span>HTTP <strong id="chat-wall">—</strong></span><span>Token <strong id="chat-tokens">—</strong></span><span>Context <strong id="chat-context">—</strong></span><span>Draft acceptance <strong id="chat-acceptance">—</strong></span><span>Tokens/step <strong id="chat-step-tokens">—</strong></span></div>
+      <form class="composer" id="chat-form"><label class="sr-only" for="chat-input">Message</label><textarea id="chat-input" rows="3" placeholder="Write a message…" required></textarea><div class="composer-footer"><span class="small muted">Ctrl / ⌘ + Enter</span><div class="button-row"><button class="button danger" id="stop-chat" type="button" hidden>Stop stream</button><button class="button primary" id="send-chat" type="submit">Send</button></div></div></form>
+      <div class="attachment-controls"><label class="button quiet small-button" for="chat-attachments">Attach files</label><input id="chat-attachments" class="sr-only" type="file" multiple><span class="small muted" id="attachment-status" role="status">Text, code, PDF or binary inspection · up to 8 files / 32 MiB each</span></div><div id="attachment-list" class="attachment-list"></div>
+      <p class="footnote">Decode excludes prefill; HTTP includes it. Live decode is browser-observed; final decode comes from the engine. Both include thinking tokens.</p>
+    </section>
+
+    <section id="panel-workspace" class="panel" role="tabpanel" aria-labelledby="tab-workspace" hidden>
+      <div class="section-heading"><h1>Coding workspace</h1><button class="button quiet" id="workspace-refresh" type="button">Refresh</button></div>
+      <p class="notice" id="workspace-capability">Checking workspace capabilities requires an authenticated connection.</p>
+      <div class="pi-layout">
+        <section class="surface pi-sidebar"><h2>Connection</h2><form id="workspace-form">
+          <label for="workspace-kind">Location</label><select id="workspace-kind"><option value="local">Local</option><option value="ssh">Remote SSH</option></select>
+          <label for="workspace-root">Workspace root</label><input id="workspace-root" placeholder="/allowed/project/root" required autocomplete="off"><p id="workspace-roots" class="small muted"></p>
+          <label for="workspace-mode">Write mode</label><select id="workspace-mode"><option value="protected">Protected copy · explicit Apply</option><option value="direct">Direct · changes original immediately</option></select><p class="small muted">Protected local copies preserve existing edits. Protected SSH is not supported; remote direct access requires an explicit choice.</p>
+          <label for="workspace-build">Independent build command (optional)</label><input id="workspace-build" placeholder="make" spellcheck="false"><label for="workspace-test">Independent test command</label><input id="workspace-test" placeholder="make test" spellcheck="false"><p class="small muted">Captured at creation, run independently after Pi. No configured test means UNVERIFIED, not PASS.</p>
+          <div id="workspace-ssh" hidden><label for="workspace-preset">SSH preset</label><select id="workspace-preset"><option value="">Choose a preset</option></select><label for="workspace-password">Password (optional, this request only)</label><input id="workspace-password" type="password" autocomplete="off"></div>
+          <label for="workspace-session">Existing session</label><select id="workspace-session"><option value="">No session selected</option></select>
+          <div class="button-row"><button class="button primary" type="submit" id="workspace-create">Create session</button><button class="button quiet" type="button" id="workspace-connect" disabled>Connect</button><button class="button quiet" type="button" id="workspace-start" disabled>Start Pi</button></div>
+        </form>
+        <details class="raw-details"><summary>New SSH preset</summary><form id="workspace-preset-form"><label for="preset-name">Name</label><input id="preset-name" required><label for="preset-host">Host</label><input id="preset-host" required><label for="preset-port">Port</label><input id="preset-port" type="number" min="1" max="65535" value="22" required><label for="preset-user">User</label><input id="preset-user" required><label for="preset-key">Private key path (optional)</label><input id="preset-key" autocomplete="off"><label for="preset-root">Remote root</label><input id="preset-root" required><button class="button quiet" type="submit">Save preset</button><p class="small muted">Host identity must already be trusted by the server. Passwords are not saved in presets.</p></form></details>
+        <div class="button-row"><button class="button danger" id="workspace-abort" disabled>Abort Pi</button><button class="button quiet" id="workspace-close" disabled>Close session</button></div><p id="workspace-status" class="small" role="status">No active workspace.</p>
+        </section>
+        <section class="surface pi-main"><h2>Pi conversation</h2><p class="small muted">Shared history is context, not a replay of previous tool commands. Review the selected conversation and workspace before submitting.</p><div class="button-row"><button class="button quiet small-button" id="pi-to-chat" type="button">Open in Chat</button><button class="button quiet small-button" id="pi-handoff" type="button">Stage shared history…</button></div><p class="small muted" id="workspace-effective">No session selected.</p><div id="workspace-messages" class="pi-messages" role="log"></div><form id="workspace-prompt-form"><label for="workspace-prompt">Instruction</label><textarea id="workspace-prompt" rows="4" required placeholder="Describe the repository task…"></textarea><button class="button primary" id="workspace-send" disabled>Send to Pi</button></form><details><summary>Agent events / tools</summary><pre id="workspace-events">No events.</pre></details></section>
+      </div>
+      <section class="surface"><div class="surface-title"><h2>Independent verification and review</h2><span id="workspace-verdict" class="badge neutral">UNVERIFIED</span></div><p class="small muted">Agent completion is not a test result. Apply requires an unchanged, independently passing protected candidate and explicit confirmation.</p><div class="button-row"><button class="button quiet" id="workspace-review" type="button" disabled>Review diff</button><button class="button quiet" id="workspace-verify" type="button" disabled>Run verification…</button><button class="button primary" id="workspace-apply" type="button" disabled>Apply verified changes…</button></div><pre id="workspace-review-output">No review collected.</pre></section>
+      <div class="pi-inspection"><section class="surface"><h2>Files</h2><form id="workspace-files-form" class="resume-form"><label class="sr-only" for="workspace-path">Relative directory</label><input id="workspace-path" placeholder="Relative directory" value=""><button class="button quiet" id="workspace-files-button" disabled>List</button></form><div id="workspace-files"></div><pre id="workspace-file-content">Choose a file to inspect.</pre></section><section class="surface"><h2>Terminal</h2><form id="workspace-terminal-form"><label for="workspace-command">Diagnostic preset</label><select id="workspace-command" disabled></select><button class="button quiet" id="workspace-terminal-run" disabled>Run</button></form><form id="workspace-shell-form"><label for="workspace-shell-command">Custom shell command</label><textarea id="workspace-shell-command" rows="3" maxlength="4096" spellcheck="false" placeholder="Enter a command for the connected workspace…" required disabled></textarea><button class="button quiet" id="workspace-shell-run" type="submit" disabled>Run command…</button></form><p class="small muted" id="workspace-shell-note">Custom commands require an idle Pi session and explicit confirmation. Local: direct writes inside the workspace sandbox, no deferred Apply. SSH: commands use the remote account privileges.</p><p class="small muted">Execution and output are recorded in Pi events; this is not an interactive PTY.</p><pre id="workspace-terminal-output">No command executed.</pre></section></div>
+    </section>
+
+    <section id="panel-coding" class="panel" role="tabpanel" aria-labelledby="tab-coding" hidden>
+      <div class="section-heading"><h1>Coding</h1><p>Advanced fallback: isolated snapshot → build → test → repair. Apply to the original only after confirmation.</p></div>
+      <div class="coding-layout">
+        <form id="coding-form" class="surface coding-form">
+          <h2>Task</h2><div class="button-row"><label class="button quiet small-button" for="code-spec">Import task JSON</label><input class="sr-only" id="code-spec" type="file" accept="application/json,.json"><button class="button quiet small-button" id="clear-import" type="button" hidden>Clear imported options</button></div>
+          <p class="small muted" id="import-summary">Importing does not submit a task or apply changes.</p>
+          <label for="code-task">Instruction</label><textarea id="code-task" rows="5" required placeholder="Describe the problem and expected outcome."></textarea>
+          <label for="code-repo">Repository / worktree</label><input id="code-repo" required autocomplete="off" placeholder="/absolute/path/project">
+          <label for="code-paths">Editable files <span class="optional">relative paths, one per line</span></label><textarea id="code-paths" rows="3" required spellcheck="false" placeholder="src/parser.cpp&#10;include/parser.hpp"></textarea>
+          <label for="code-build">Build command <span class="optional">optional</span></label><input id="code-build" spellcheck="false" placeholder="make">
+          <label for="code-test">Test command</label><input id="code-test" required spellcheck="false" placeholder="make test">
+          <div class="form-grid"><div><label for="code-timeout">Request timeout (s)</label><input id="code-timeout" type="number" min="10" max="600" value="600" required></div><div><label for="code-repairs">Maximum repairs</label><input id="code-repairs" type="number" min="0" max="6" value="2" required></div></div>
+          <p class="small muted">Reasoning and output limits follow the sidebar; legacy context is a source-selection budget. The runtime also enforces the total limit. Commands run only in the sandbox.</p>
+          <button class="button primary full-width" id="start-task" type="submit">Start isolated task</button><p class="form-error" id="coding-error" role="alert" hidden></p>
+        </form>
+        <div class="coding-results">
+          <section class="surface result-surface"><div class="surface-title"><h2>Execution</h2><span class="badge neutral" id="task-status">IDLE</span></div>
+            <form id="resume-form" class="resume-form"><label class="sr-only" for="resume-id">Existing task ID</label><input id="resume-id" placeholder="Existing task ID" autocomplete="off" spellcheck="false"><button class="button quiet" type="submit">Open</button></form>
+            <p class="task-id" id="task-id">No task submitted</p>
+            <div class="result-metrics"><div><span>Total time</span><strong id="task-wall">—</strong></div><div><span>Model calls</span><strong id="task-calls">—</strong></div><div><span id="task-tps-label">Last attempt TPS</span><strong id="task-tps">—</strong></div><div><span>Reasoning</span><strong id="task-profile">—</strong></div></div>
+            <p class="small muted" id="task-summary">No results.</p><div id="attempts" class="attempts" aria-live="polite"></div>
+            <div class="button-row task-actions"><button class="button danger" id="cancel-task" type="button" disabled>Cancel task</button><button class="button quiet" id="refresh-task" type="button" disabled>Refresh</button><button class="button primary" id="apply-task" type="button" disabled>Apply passing patch</button></div><p class="small" id="task-action-result" role="status"></p>
+          </section>
+          <section class="surface diff-surface"><div class="surface-title"><h2>Diff</h2><button class="button quiet small-button" id="copy-diff" type="button" disabled>Copy</button><button class="button quiet small-button" id="download-diff" type="button" disabled>Save</button></div><p class="small muted" id="files-changed">No changes.</p><pre class="diff" id="task-diff" tabindex="0">The diff will appear here. Generation does not modify the original repository.</pre></section>
+          <details class="surface raw-details"><summary>Task details and metrics</summary><pre id="task-json">No results.</pre></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-models" class="panel" role="tabpanel" aria-labelledby="tab-models" hidden>
+      <div class="section-heading"><h1>Models</h1><button class="button quiet" id="refresh-models">Refresh Models</button></div>
+      <nav class="models-section-links" aria-label="Model sections"><a class="button quiet" href="#model-downloads">Find &amp; download</a><a class="button quiet" href="#models-catalog">Local &amp; tested</a></nav>
+      <p class="small muted section-note">Find downloads and inspect local models in one place. Downloading does not load a model or qualify its runtime.</p>
+      <section id="models-catalog" aria-labelledby="models-catalog-title"><h2 id="models-catalog-title">Local &amp; tested</h2><p class="small muted">Availability, architecture, distribution and test evidence come from this server's catalog. New downloads are not automatically added as qualified models.</p><div id="models-list" class="catalog-list"><p class="muted">Sign in to inspect local models and test evidence.</p></div></section>
+    </section>
+    <section id="panel-benchmarks" class="panel" role="tabpanel" aria-labelledby="tab-benchmarks" hidden>
+      <div class="section-heading"><h1>Benchmarks and operations</h1><button class="button quiet" id="refresh-benchmarks">Refresh</button></div><p class="small muted section-note">Every run or download requires confirmation. Historical results are not measurements from this session.</p>
+      <div class="surface"><h2>Available actions</h2><div id="operation-actions" class="operation-actions"><p class="muted">Options not loaded.</p></div></div>
+      <div class="surface"><h2>Job</h2><div id="operation-jobs"><p class="muted">No data.</p></div></div><div class="surface"><h2>Recorded evidence</h2><div id="benchmark-evidence"><p class="muted">Catalog not loaded.</p></div></div>
+    </section>
+
+    <section id="panel-cluster" class="panel" role="tabpanel" aria-labelledby="tab-cluster" hidden>
+      <div class="section-heading"><h1>Cluster</h1><button class="button quiet" id="refresh-cluster">Refresh status</button></div>
+      <section class="surface lifecycle-control" aria-labelledby="lifecycle-title">
+        <div class="surface-title"><h2 id="lifecycle-title">Model inference</h2><span class="badge neutral" id="lifecycle-state">UNKNOWN</span></div>
+        <p class="small muted" id="lifecycle-detail">Connect to inspect model residency.</p>
+        <div class="button-row lifecycle-actions"><button class="button primary" id="lifecycle-on" type="button" disabled>Turn model on</button><button class="button danger" id="lifecycle-off" type="button" disabled>Turn model off</button></div>
+        <dl class="lifecycle-meta"><dt>Cluster owner</dt><dd id="lifecycle-owner">—</dd><dt>Coordinator</dt><dd id="lifecycle-coordinator">—</dd><dt>Readiness</dt><dd id="lifecycle-readiness">—</dd><dt>OFF drain deadline</dt><dd id="lifecycle-drain">—</dd></dl>
+        <div id="lifecycle-nodes" class="lifecycle-nodes"><p class="small muted">No lifecycle node state received.</p></div>
+        <p class="small muted lifecycle-note">ON/OFF controls the configured model resources. The frontend remains available while inference is OFF. UNKNOWN is never treated as OFF.</p>
+      </section>
+      <div class="cluster-overview surface"><div><h2 id="cluster-model">Model not detected</h2><p id="cluster-runtime" class="small muted">Runtime details unavailable.</p></div><span class="badge neutral" id="cluster-health">UNKNOWN</span></div>
+      <div id="cluster-nodes" class="cluster-nodes"><div class="surface missing-state">Node telemetry not received.</div></div>
+      <div class="cluster-metrics"><div class="surface metric-card"><span>Draft acceptance</span><strong id="cluster-acceptance">—</strong><small>Last available measurement</small></div><div class="surface metric-card"><span>Active request</span><strong id="cluster-active">—</strong><small>Server-reported state</small></div><div class="surface metric-card"><span>Runtime limit</span><strong id="cluster-context">—</strong><small>Not a quality qualification at this context length</small></div><div class="surface metric-card"><span>Last update</span><strong id="cluster-updated">—</strong><small id="cluster-check-note">No response received</small></div></div>
+      <p class="notice neutral">Pair lifecycle remains under the ownership-aware controller. The UI never restarts one rank alone.</p><details class="surface raw-details"><summary>Raw health and status</summary><pre id="cluster-json">No data.</pre></details>
+    </section>
+  </main>
+</div>
+</body>
+</html>
