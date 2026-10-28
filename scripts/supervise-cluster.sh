@@ -35,3 +35,4 @@ while true; do
         consecutive_failures=0
     fi
 done
+

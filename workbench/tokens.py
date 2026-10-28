@@ -82,7 +82,7 @@ def count(messages, output, capacity, *, reasoning_effort="xhigh"):
         raise ValueError('Output budget must be positive')
     effort=normalize_reasoning_effort(reasoning_effort)
     n=len(TOKENIZER.encode(render(messages,effort),add_special_tokens=False).ids)
-    required=n+output+c.CONFIG['margin_tokens']
+    required=n+output+c.CONFIG.get('margin_tokens', 1024)
     if required>capacity:
         raise ValueError(f'Context rejected before dispatch: input{n}+output{output}+margin1024={required}, capacity{capacity}; no truncation')
     return {'input_tokens':n,'max_output':output,'margin':1024,'required':required,'capacity':capacity,
@@ -142,7 +142,7 @@ def count_uncensored(messages, output, capacity, *, reasoning_effort="xhigh"):
     effort = normalize_reasoning_effort(reasoning_effort)
     prompt = render_uncensored(messages, effort)
     n = len(TOKENIZER.encode(prompt, add_special_tokens=False).ids)
-    required = n + output + c.CONFIG['margin_tokens']
+    required = n + output + c.CONFIG.get('margin_tokens', 1024)
     if required > capacity:
         raise ValueError(
             f'Context rejected before dispatch: input{n}+output{output}+'

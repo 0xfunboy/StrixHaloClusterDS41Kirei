@@ -298,7 +298,16 @@ def open_stream(backend_id: str, path: str, value: dict, timeout: float):
 
 
 def health(backend_id: str, timeout: float = 5) -> dict:
-    return request(backend_id, "/health", timeout=timeout)
+    try:
+        return request(backend_id, "/health", timeout=timeout)
+    except Exception as exc:
+        try:
+            m = models(backend_id, timeout=timeout)
+            if isinstance(m, dict) and m.get("data"):
+                return {"status": "ok", "source": "v1/models"}
+        except Exception:
+            pass
+        raise exc
 
 
 def models(backend_id: str, timeout: float = 5) -> dict:
@@ -621,7 +630,25 @@ def status(backend_id: str) -> dict:
         executor.shutdown(wait=False, cancel_futures=True)
 
     health_value = values.get("health")
-    available = isinstance(health_value, dict) and health_value.get("status") in {"ok", "ready"}
+    models_value = values.get("models")
+    has_valid_models = (
+        isinstance(models_value, dict)
+        and bool(models_value.get("data"))
+        and any(
+            isinstance(item, dict) and item.get("id") == backend.model_id
+            for item in models_value.get("data", [])
+        )
+    )
+    available = (
+        isinstance(health_value, dict) and health_value.get("status") in {"ok", "ready"}
+    ) or has_valid_models
+
+    if available and "health" in errors and has_valid_models:
+        errors.pop("health", None)
+        if not isinstance(health_value, dict) or not health_value:
+            health_value = {"status": "ok", "source": "v1/models"}
+            values["health"] = health_value
+
     current_slots = values.get("slots") if isinstance(values.get("slots"), list) else None
     result["health"] = health_value if isinstance(health_value, dict) else {}
     live_capacity = None

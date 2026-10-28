@@ -572,8 +572,6 @@ def statuses(app) -> list[dict]:
             row["state"] = "queued"
         elif not row.get("available"):
             row["state"] = "offline"
-        elif row.get("native_busy") is None:
-            row["state"] = "degraded"
         else:
             row["state"] = "ready"
         rows.append(row)

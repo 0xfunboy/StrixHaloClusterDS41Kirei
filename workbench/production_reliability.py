@@ -88,36 +88,42 @@ def recovery_request(primary, project, backend_id):
     primary_cap = int(primary.get("max_tokens", 4096))
     cap = min(RECOVERY_MAX_OUTPUT, max(8192, primary_cap * 2))
     capacity = backends.effective_capacity(backend_id)
-    # This renderer includes xhigh framing and therefore safely overestimates
-    # the final-only request. Native prompt_tokens are retained in the receipt.
-    measured = tokens.count(messages, cap, capacity)
-    measured.update(
-        reasoning_requested="none",
-        reasoning_effective="none",
-        renderer_contract="qwen38-v080-final-only-recovery-v1",
-        note=(
-            "Conservative xhigh offline count used only as a context upper bound; "
-            "native recovery uses reasoning_effort none."
-        ),
-    )
-    body.update(
-        messages=messages,
-        max_tokens=cap,
-        reasoning_effort="none",
-        preserve_thinking=False,
-        temperature=0.2,
-        top_p=0.95,
-        top_k=20,
-        min_p=0,
-        repeat_penalty=1,
-        presence_penalty=0,
-        frequency_penalty=0,
-        seed=int(primary.get("seed", 64004)) + 101,
-        cache_prompt=True,
-        stream=True,
-        return_progress=True,
-        stream_options={"include_usage": True},
-    )
+    if backend_id == backends.DEEPSEEK_KIREI:
+        measured = backends.count(backend_id, messages, cap)
+        measured.update(
+            reasoning_requested="none",
+            reasoning_effective="none",
+        )
+        body = backends.payload(backend_id, messages, cap, project["kind"])
+    else:
+        measured = tokens.count(messages, cap, capacity)
+        measured.update(
+            reasoning_requested="none",
+            reasoning_effective="none",
+            renderer_contract="qwen38-v080-final-only-recovery-v1",
+            note=(
+                "Conservative xhigh offline count used only as a context upper bound; "
+                "native recovery uses reasoning_effort none."
+            ),
+        )
+        body.update(
+            messages=messages,
+            max_tokens=cap,
+            reasoning_effort="none",
+            preserve_thinking=False,
+            temperature=0.2,
+            top_p=0.95,
+            top_k=20,
+            min_p=0,
+            repeat_penalty=1,
+            presence_penalty=0,
+            frequency_penalty=0,
+            seed=int(primary.get("seed", 64004)) + 101,
+            cache_prompt=True,
+            stream=True,
+            return_progress=True,
+            stream_options={"include_usage": True},
+        )
     return body, measured
 
 
