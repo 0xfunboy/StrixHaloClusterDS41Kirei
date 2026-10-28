@@ -1,0 +1,65 @@
+{
+  "listen": "127.0.0.1:18230",
+  "backend": "http://127.0.0.1:18231",
+  "tokenizer_endpoint": "http://10.55.0.1:18232/tokenize",
+  "chat_context_tokens": 4096,
+  "chat_default_output_tokens": 4096,
+  "chat_max_output_tokens": 8192,
+  "thinking_budget_supported": true,
+  "tool_calls_supported": false,
+  "model": "DeepSeek-V4.1-Flash-Kirei-HIP-DualStrix",
+  "state_dir": "/home/funboy/.local/state/haloclu-ds41-kirei",
+  "workspace_roots": [
+    "/home/funboy/StrixHaloClusterDS41Kirei"
+  ],
+  "pair_lock": "/home/funboy/.local/state/haloclu-ds41-kirei/gateway-admission.lock",
+  "default_profile": "high",
+  "profiles": {
+    "code_dspark": {
+      "reasoning": "high",
+      "context_tokens": 4096,
+      "max_tokens": 4096,
+      "max_repairs": 0,
+      "expected_tok_per_sec": 70.6
+    },
+    "single_user": {
+      "reasoning": "medium",
+      "context_tokens": 4096,
+      "max_tokens": 4096,
+      "max_repairs": 0,
+      "expected_tok_per_sec": 50.0
+    },
+    "prose": {
+      "reasoning": "medium",
+      "context_tokens": 4096,
+      "max_tokens": 4096,
+      "max_repairs": 0,
+      "expected_tok_per_sec": 45.0
+    },
+    "aggregate_n8": {
+      "reasoning": "high",
+      "context_tokens": 4096,
+      "max_tokens": 4096,
+      "max_repairs": 0,
+      "expected_aggregate_tok_per_sec": 113.9
+    }
+  },
+  "profile_status": "KIREISTUDIOS_CUSTOM_HIP_DUAL_STRIX; GFX1151_USB4_DMA_TP2; BIT_EXACT_DSPARK_MTP",
+  "context_format": "json",
+  "max_context_tokens": 65536,
+  "max_files": 300,
+  "max_file_bytes": 262144,
+  "max_repo_bytes": 33554432,
+  "model_timeout": 1800,
+  "sandbox_timeout": 90,
+  "sandbox_memory_bytes": 1073741824,
+  "sandbox_tasks": 64,
+  "remote_ssh": "02-evo-x3-tb",
+  "lifecycle_command": "/home/funboy/StrixHaloClusterDS41Kirei/scripts/launch-pair.sh",
+  "reasoning_modes": [
+    "low",
+    "medium",
+    "high",
+    "max"
+  ]
+}

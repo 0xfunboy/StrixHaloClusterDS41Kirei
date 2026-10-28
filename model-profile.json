@@ -1,0 +1,22 @@
+{
+  "schema": "strix-model-profile-v1",
+  "model_id": "deepseek41-flash-kirei",
+  "serving_model_id": "DeepSeek-V4.1-Flash-Kirei-HIP-DualStrix",
+  "repository": "StrixHaloClusterDS41Kirei",
+  "gateway_config": "config.json",
+  "engine_reference": "vendor/strix-halo-engine-lab/docs/models/deepseek-v4.1/production-defaults.md",
+  "resource_group": "strix-pair",
+  "automatic_switching": false,
+  "frontend_qualified": true,
+  "qualification_scope": "KireiStudios / hyukudan strix-halo-engine-lab dual-Strix Halo (2x Ryzen AI Max+ 395, gfx1151) USB4/Thunderbolt expert tensor parallel with DSpark speculative decoding and U6/Trellis dense mix",
+  "deployment_in_this_change": true,
+  "target_metrics": {
+    "decode_tps_code_dspark": 70.6,
+    "decode_tps_single_user": 50.0,
+    "decode_tps_prose": 45.0,
+    "decode_tps_greedy": 35.0,
+    "decode_tps_aggregate_n8": 113.9,
+    "prefill_tps_64k": 600.0,
+    "bit_exact": true
+  }
+}
