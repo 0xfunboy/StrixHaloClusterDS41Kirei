@@ -51,3 +51,4 @@ exec "$SERVE_BIN" "$BASE_MODEL" \
   --layers 40 --tp-attention --engram-direct \
   --prefill-path device --prefill-rows 2048 --slots 2 --context 32768 \
   $([ -f "$DSPARK_MODEL" ] && echo "--dspark $DSPARK_MODEL --dspark-vocab auto:$VOCAB_DIR" || true)
+
