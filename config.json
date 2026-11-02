@@ -2,7 +2,7 @@
   "listen": "127.0.0.1:18230",
   "backend": "http://127.0.0.1:18231",
   "tokenizer_endpoint": "http://10.55.0.1:18232/tokenize",
-  "chat_context_tokens": 32768,
+  "chat_context_tokens": 131072,
   "chat_default_output_tokens": 4096,
   "chat_max_output_tokens": 8192,
   "thinking_budget_supported": true,
@@ -17,28 +17,28 @@
   "profiles": {
     "code_dspark": {
       "reasoning": "high",
-      "context_tokens": 32768,
+      "context_tokens": 131072,
       "max_tokens": 4096,
       "max_repairs": 0,
       "expected_tok_per_sec": 70.6
     },
     "single_user": {
       "reasoning": "medium",
-      "context_tokens": 32768,
+      "context_tokens": 131072,
       "max_tokens": 4096,
       "max_repairs": 0,
       "expected_tok_per_sec": 50.0
     },
     "prose": {
       "reasoning": "medium",
-      "context_tokens": 32768,
+      "context_tokens": 131072,
       "max_tokens": 4096,
       "max_repairs": 0,
       "expected_tok_per_sec": 45.0
     },
     "aggregate_n8": {
       "reasoning": "high",
-      "context_tokens": 32768,
+      "context_tokens": 131072,
       "max_tokens": 4096,
       "max_repairs": 0,
       "expected_aggregate_tok_per_sec": 113.9
@@ -46,7 +46,7 @@
   },
   "profile_status": "KIREISTUDIOS_CUSTOM_HIP_DUAL_STRIX; GFX1151_USB4_DMA_TP2; BIT_EXACT_DSPARK_MTP",
   "context_format": "json",
-  "max_context_tokens": 65536,
+  "max_context_tokens": 131072,
   "max_files": 300,
   "max_file_bytes": 262144,
   "max_repo_bytes": 33554432,
@@ -63,4 +63,3 @@
     "max"
   ]
 }
-

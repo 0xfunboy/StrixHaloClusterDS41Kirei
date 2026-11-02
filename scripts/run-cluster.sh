@@ -6,10 +6,10 @@ ROOT_DIR="/home/funboy/StrixHaloClusterDS41Kirei"
 REMOTE_NODE="02-evo-x3-tb"
 COORDINATOR_PORT="9920"
 API_PORT="18231"
-ROCM_LIB="/home/funboy/StrixHaloClusterGLM/.engine/venv/lib/python3.14/site-packages/_rocm_sdk_devel/lib"
+ROCM_LIB="/home/funboy/StrixHaloClusterDS41Kirei/.venv-rocm/lib/python3.14/site-packages/_rocm_sdk_devel/lib"
 
 KIREI_DIR="/home/funboy/models/ds41/kirei"
-BASE_MODEL="$KIREI_DIR/DeepSeek-V4.1-Flash-1017-Q2.gguf"
+BASE_MODEL="/home/funboy/models/ds41/ds41-abliterated-q2-imatrix/DeepSeek-V4.1-Flash-Abliterated-Q2-imatrix.gguf"
 DSPARK_MODEL="$KIREI_DIR/DeepSeek-V4.1-Flash-1017-DSpark-MXFP4.gguf"
 OVERLAY_GGUF="$KIREI_DIR/c-u6.gguf"
 VOCAB_DIR="$KIREI_DIR/vocab"
@@ -49,6 +49,5 @@ exec "$SERVE_BIN" "$BASE_MODEL" \
   --peer-timeout 120 \
   --http-bind 127.0.0.1 --http-port "$API_PORT" \
   --layers 40 --tp-attention --engram-direct \
-  --prefill-path device --prefill-rows 2048 --slots 2 --context 32768 \
+  --prefill-path device --prefill-rows 2048 --slots 1 --context 131072 \
   $([ -f "$DSPARK_MODEL" ] && echo "--dspark $DSPARK_MODEL --dspark-vocab auto:$VOCAB_DIR" || true)
-

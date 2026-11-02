@@ -32,7 +32,7 @@ for i in $(seq 1 60); do
         if systemctl --user is-active strix-ds41-workbench.service >/dev/null 2>&1; then
             echo "HaloClu Workbench is active via systemd service."
         elif ! pgrep -f 'workbench/app.py' >/dev/null 2>&1; then
-            systemctl --user start strix-ds41-workbench.service 2>/dev/null || setsid /home/funboy/StrixHaloClusterGLM/.engine/venv/bin/python "$ROOT_DIR/workbench/app.py" > /tmp/strix-kirei-workbench.log 2>&1 < /dev/null &
+            systemctl --user start strix-ds41-workbench.service 2>/dev/null || setsid /home/funboy/StrixHaloClusterDS41Kirei/.venv-rocm/bin/python "$ROOT_DIR/workbench/app.py" > /tmp/strix-kirei-workbench.log 2>&1 < /dev/null &
         fi
         echo "HaloClu Workbench live on http://127.0.0.1:18232"
         exit 0

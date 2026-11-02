@@ -4,13 +4,13 @@ set -Eeuo pipefail
 REMOTE_NODE=02-evo-x3-tb
 ROOT=/home/funboy/StrixHaloClusterDS41Kirei
 DS4_ROOT=/home/funboy/StrixHaloClusterDS41/.vendor/ds4-v41-halo-7d0454b
-ROCM_LIB=/home/funboy/StrixHaloClusterGLM/.engine/venv/lib/python3.14/site-packages/_rocm_sdk_devel/lib
+ROCM_LIB=/home/funboy/StrixHaloClusterDS41Kirei/.venv-rocm/lib/python3.14/site-packages/_rocm_sdk_devel/lib
 MODEL=/home/funboy/models/ds41/ds41-abliterated-q2-imatrix/DeepSeek-V4.1-Flash-Abliterated-Q2-imatrix.gguf
 VISION=/home/funboy/models/ds41/vision/DeepSeek-V4.1-Flash-1017-Vision.gguf
 COORD=10.55.0.1
 TP_PORT=9911
 API_PORT=18231
-CTX=32768
+CTX=131072
 KIREI_BIN="$ROOT/bin/strix-deepseek41-serve"
 KIREI_UNIT=strix-ds41-kirei.service
 COORD_LOG=/tmp/ds41-native-vision-coordinator.log
