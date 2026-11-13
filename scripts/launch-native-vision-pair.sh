@@ -41,6 +41,23 @@ pkill -TERM -x ds4-server 2>/dev/null || true
 ssh -o BatchMode=yes -o ConnectTimeout=8 "$REMOTE_NODE" \
     'pkill -TERM -x ds4 2>/dev/null || true'
 
+remote_ds4_state=running
+for _ in $(seq 1 90); do
+    remote_ds4_state=$(ssh -o BatchMode=yes -o ConnectTimeout=8 "$REMOTE_NODE" \
+        'if pgrep -x ds4 >/dev/null || ! flock -n /tmp/ds4.lock true; then printf running; else printf stopped; fi') || {
+        echo "Cannot verify NODE02 worker shutdown; refusing to start." >&2
+        exit 6
+    }
+    if ! pgrep -x ds4-server >/dev/null && flock -n "${DS4_LOCK_FILE:-/tmp/ds4.lock}" true && [[ $remote_ds4_state == stopped ]]; then
+        break
+    fi
+    sleep 1
+done
+if pgrep -x ds4-server >/dev/null || ! flock -n "${DS4_LOCK_FILE:-/tmp/ds4.lock}" true || [[ $remote_ds4_state != stopped ]]; then
+    echo "Previous DS4 processes did not stop; refusing to start." >&2
+    exit 6
+fi
+
 for _ in $(seq 1 30); do
     if ! ss -ltnH "sport = :$API_PORT" | grep -q .; then break; fi
     sleep 1
@@ -55,12 +72,14 @@ nohup env LD_LIBRARY_PATH="$ROCM_LIB:${LD_LIBRARY_PATH:-}" DS4_TP_GATE_TIMEOUT_M
     --tensor-parallel --role coordinator --listen "$COORD" "$TP_PORT" --transport tcp \
     --batched-session 1 --host 127.0.0.1 --port "$API_PORT" \
     > "$COORD_LOG" 2>&1 < /dev/null &
-echo "Coordinator PID $!"
+COORD_PID=$!
+echo "Coordinator PID $COORD_PID"
 
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_NODE" \
     "nohup env LD_LIBRARY_PATH='$ROCM_LIB' DS4_TP_GATE_TIMEOUT_MS='$TP_GATE_TIMEOUT_MS' '$DS4_ROOT/ds4' --rocm -m '$MODEL' --vision '$VISION' --ctx '$CTX' --tensor-parallel --role worker --coordinator '$COORD' '$TP_PORT' --transport tcp > '$WORKER_LOG' 2>&1 < /dev/null & echo worker-started"
 
 for _ in $(seq 1 180); do
+    if ! kill -0 "$COORD_PID" 2>/dev/null; then break; fi
     if pgrep -f "^$DS4_ROOT/ds4-server " >/dev/null &&
         curl -fsS -m 3 "http://127.0.0.1:$API_PORT/v1/models" >/tmp/ds41-native-vision-models.json 2>/dev/null; then
         cat /tmp/ds41-native-vision-models.json
