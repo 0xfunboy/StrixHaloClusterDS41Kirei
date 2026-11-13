@@ -49,5 +49,7 @@ exec "$SERVE_BIN" "$BASE_MODEL" \
   --peer-timeout 120 \
   --http-bind 127.0.0.1 --http-port "$API_PORT" \
   --layers 40 --tp-attention --engram-direct \
-  --prefill-path device --prefill-rows 2048 --slots 1 --context 131072 \
+  --prefill-path device --prefill-rows 2048 --slots 1 --context 262144 \
+    --prefix-cache-mb 512 --prefix-reserve-mb 16384 --prefix-block 256 \
+    --prefix-inrun-snapshots --prefix-before-tail --no-prefix-session-snapshots \
   $([ -f "$DSPARK_MODEL" ] && echo "--dspark $DSPARK_MODEL --dspark-vocab auto:$VOCAB_DIR" || true)
